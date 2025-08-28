@@ -18,7 +18,7 @@ class TestTextNode(unittest.TestCase):
         )
     
     def test_to_html_no_children(self):
-        parent_node = ParentNode("div", [])
+        parent_node = ParentNode("div", None)
         with self.assertRaises(ValueError) as context:
             parent_node.to_html()
         self.assertEqual(str(context.exception), "The parent node must have children.")
@@ -35,7 +35,7 @@ class TestTextNode(unittest.TestCase):
     
     def test_to_html_no_tag(self):
         child_node = LeafNode("span", "child")
-        parent_node = ParentNode(None, [child_node])
+        parent_node = ParentNode(tag=None, children=[child_node])
         with self.assertRaises(ValueError) as context:
             parent_node.to_html()
         self.assertEqual(str(context.exception), "All parent nodes must have a tag.")
