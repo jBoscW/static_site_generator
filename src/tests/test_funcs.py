@@ -195,6 +195,41 @@ class TestTextNode(unittest.TestCase):
             TextNode(" here", TextType.TEXT)
         ]
         self.assertEqual(result, expected)
+
+    
+    #text_to_textnodes
+    def test_text_to_textnodes_no_formatting(self):
+        text = "This is plain text."
+        nodes = text_to_textnodes(text)
+        expected = [TextNode("This is plain text.", TextType.TEXT)]
+        self.assertEqual(nodes, expected)
+    
+    def test_text_to_textnodes_bold_and_italic(self):
+        text = "This is **bold** and _italic_ text."
+        nodes = text_to_textnodes(text)
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" text.", TextType.TEXT)
+        ]
+        self.assertEqual(nodes, expected)
+    
+    def test_text_code_and_images_and_links(self):
+        text = "Here is `code`, an image ![alt](https://i.imgur.com/zjjcJKZ.png), and a link [boot.dev](https://www.boot.dev)."
+        nodes = text_to_textnodes(text)
+        expected = [
+            TextNode("Here is ", TextType.TEXT),
+            TextNode("code", TextType.CODE),
+            TextNode(", an image ", TextType.TEXT),
+            TextNode("alt", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(", and a link ", TextType.TEXT),
+            TextNode("boot.dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(".", TextType.TEXT)
+        ]
+        self.assertEqual(nodes, expected)
+    
         
 
 if __name__ == "__main__":

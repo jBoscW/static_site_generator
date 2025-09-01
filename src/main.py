@@ -1,6 +1,7 @@
 from .textnode import TextNode, TextType
 from .htmlnode import *
 from .funcs import *
+from .funcs_block import *
 
 def main(): 
     node = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")

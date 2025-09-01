@@ -85,7 +85,7 @@ def split_nodes_image(old_nodes):
 
             if regular_text[0]:
                 out.append(TextNode(regular_text[0], TextType.TEXT))
-                
+
             out.append(TextNode(img_text, TextType.IMAGE, url))
 
             start_index = s.find(text_url, start_index) + len(text_url)
@@ -129,3 +129,13 @@ def split_nodes_link(old_nodes):
             out.append(TextNode(regular_text[1], TextType.TEXT))
 
     return out
+
+def text_to_textnodes(text):
+    text = [TextNode(text, TextType.TEXT)]
+    text = split_nodes_delimiter(text, '**', TextType.BOLD)
+    text = split_nodes_delimiter(text, '_', TextType.ITALIC)
+    text = split_nodes_delimiter(text, '`', TextType.CODE)
+    text = split_nodes_image(text)
+    text = split_nodes_link(text)
+
+    return text
