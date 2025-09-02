@@ -88,9 +88,10 @@ def split_nodes_image(old_nodes):
 
             out.append(TextNode(img_text, TextType.IMAGE, url))
 
-            start_index = s.find(text_url, start_index) + len(text_url)
+            start_index = s.find(text_url, start_index)
             if start_index == -1:
                 raise ValueError('brother, text_url link not found')
+            start_index += len(text_url)
         
         if regular_text[1]:
             out.append(TextNode(regular_text[1], TextType.TEXT))
