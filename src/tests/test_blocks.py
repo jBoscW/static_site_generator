@@ -110,7 +110,23 @@ This is the same paragraph on a new line
                 expected_type,
                 f"Expected {expected_type} for block: {block}"
             )
+    
+    #markdown_to_html_node
+    def test_block_types(self):
+        md = """This is a paragraph.
 
+### This is a heading
+
+```python```
+"""
+        blocks = markdown_to_html_node(md)
+        # i am testing if it creates a zipped list of block and BlockType tuples
+        expected = [
+            ("This is a paragraph.", BlockType.PARAGRAPH),
+            ("### This is a heading", BlockType.HEADING),
+            ("```python```", BlockType.CODE)
+        ]
+        self.assertListEqual(blocks, expected)
 
 if __name__ == "__main__":
     unittest.main()
