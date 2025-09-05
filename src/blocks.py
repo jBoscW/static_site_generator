@@ -14,12 +14,11 @@ class BlockType(Enum):
     ORDERED_LIST = "ol"
 
 def markdown_to_html_node(markdown): 
-
     blocks = markdown_to_blocks(markdown)
-
     types = [block_to_block_type(bloc) for bloc in blocks]
-    
-    return list(zip(blocks, types))
+
+    html_nodes = block_and_type_to_html(blocks, types)
+    return ParentNode('div', html_nodes)
 
 #########
 
@@ -33,41 +32,29 @@ def markdown_to_blocks(markdown_text):
 
 
 def block_to_block_type(markdown):
-    first_word = markdown.split()[0]
-    if len(set(first_word)) == 1 and len(first_word) <= 6 and '#' in first_word:
+    lines = markdown.split('\n')
+
+    if markdown.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
-    if markdown.startswith("```") and markdown.endswith("```"): 
+    if markdown.startswith("```") and lines[-1].startswith("```"): 
         return BlockType.CODE
-    
-    quote, unord, orde = True, True, True
-    for line in markdown.split('\n'): 
-        if not line.startswith('>'):
-            quote = False
-        if not line.startswith('- '): 
-            unord = False
-        if not quote and not unord: 
-            break
-
-    if quote: return BlockType.QUOTE
-    if unord: return BlockType.UNORDERED_LIST
-
-    num = 1
-    for line in markdown.split('\n'): 
-        if not line.startswith(f"{num}. "):
-            orde = False
-            break
-        num += 1
-    if orde: return BlockType.ORDERED_LIST
-
+    if markdown.startswith('> '): 
+        if all(line.startswith('> ') for line in lines):
+            return BlockType.QUOTE
+    if markdown.startswith('- '): 
+        if all(line.startswith('- ') for line in lines):
+            return BlockType.UNORDERED_LIST
+    if markdown[0].isdigit():
+        if all(re.match(r"\d+\. ", line) for line in lines):
+            return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
 
 def block_and_type_to_html(blocks, types):
     block_types = list(zip(blocks, types))
-    children_body = []
+    html_nodes = []
 
     for txt, type in block_types:
         html_node = None
-
         match type:
             case BlockType.CODE: 
                 html_node = create_code_html_node(txt)
@@ -76,22 +63,22 @@ def block_and_type_to_html(blocks, types):
             case BlockType.UNORDERED_LIST:
                 html_node = create_unordered_list_html_node(txt)
             case BlockType.HEADING: 
-                html_node = create_other_html_node
+                html_node = create_heading_html_node(txt)
             case BlockType.PARAGRAPH: 
                 html_node = create_other_html_node(txt, BlockType.PARAGRAPH)
             case BlockType.QUOTE: 
                 html_node = create_other_html_node(txt, BlockType.QUOTE)
+            case _: 
+                raise ValueError('invalid BlockType')
             
-        children_body.append(html_node)
-            
+        html_nodes.append(html_node)
 
-    main_node = ParentNode(tag='div', children=children_body)
-    return main_node
+    return html_nodes
 
 ###level 3 funcs
 def create_code_html_node(txt):
-    txt = txt[3:-3].strip() # bc of ```code ``` md styling
-
+    txt = txt[3:-3].strip()
+    
     code_text_node = TextNode(txt, TextType.CODE)
     code_html_child = fu.text_node_to_html_node(code_text_node)
     
@@ -106,8 +93,7 @@ def create_unordered_list_html_node(txt):
         txt_nodes = fu.text_to_textnodes(line)
         html_nodes = [fu.text_node_to_html_node(i) for i in txt_nodes]
 
-        li_node = ParentNode('li', html_nodes)
-        children.append(li_node)
+        children.append(ParentNode('li', html_nodes))
     
     return ParentNode('ul', children)
 
@@ -122,14 +108,14 @@ def create_ordered_list_html_node(txt):
         txt_nodes = fu.text_to_textnodes(line)
         html_nodes = [fu.text_node_to_html_node(i) for i in txt_nodes]
 
-        li_node = ParentNode('li', html_nodes)
-        children.append(li_node)
+        children.append(ParentNode('li', html_nodes))
     
     return ParentNode('ol', children)
 
 def create_other_html_node(txt, blocktype):
     if blocktype is BlockType.QUOTE: 
         txt = txt[2:] #skips '> '
+    txt = txt.replace('\n', ' ')
 
     tag = blocktype.value
     txt_nodes = fu.text_to_textnodes(txt)
@@ -138,35 +124,16 @@ def create_other_html_node(txt, blocktype):
     return ParentNode(tag, html_nodes)
 
 def create_heading_html_node(txt):
-    heading_level = len(txt.split()[0])
-    tag = f'h{heading_level}'
+    heading_level = 0
+    for char in txt: 
+        if char == '#': 
+            heading_level += 1
+        else: 
+            break
 
-    txt = txt[heading_level + 1: ] # "## wow" becomes <h2>wow</h2>
+    tag = f'h{heading_level}'
+    txt = txt[heading_level:].strip() # "## wow" becomes <h2>wow</h2>
     txt_nodes = fu.text_to_textnodes(txt)
     html_nodes = [fu.text_node_to_html_node(i) for i in txt_nodes]
 
     return ParentNode(tag, html_nodes)
-    
-
-####level 3.5 func
-# def block_type_to_parent_node(type, children, heading_level=None): 
-#     match type: 
-#         case BlockType.PARAGRAPH: 
-#             return ParentNode('p', children)
-#         case BlockType.HEADING:
-#             if heading_level is None: 
-#                 raise ValueError("heading level must be provided for heading block type")
-#             heading_tag = f'h{heading_level}'
-#             return ParentNode(heading_tag, children)
-#         case BlockType.CODE: 
-#             return ParentNode('pre', children)
-#         case BlockType.QUOTE:
-#             return ParentNode('blockquote', children)
-#         case BlockType.UNORDERED_LIST:
-#             ## add a function in the main func so the children are all parent nodes with <li>
-#             return ParentNode('ul', children)
-#         case BlockType.ORDERED_LIST: 
-#             ## add a function in the main func so the children are all parent nodes with <li>
-#             return ParentNode('ol', children)
-#         case _: 
-#             raise ValueError('Not. ablock type -bich')

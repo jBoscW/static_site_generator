@@ -1,7 +1,4 @@
 import unittest
-
-# from src.textnode import *
-# from src.htmlnode import *
 from src.blocks import *
 
 
@@ -112,21 +109,92 @@ This is the same paragraph on a new line
             )
     
     #markdown_to_html_node
-    def test_block_types(self):
-        md = """This is a paragraph.
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
 
-### This is a heading
+This is another paragraph with _italic_ text and `code` here
 
-```python```
 """
-        blocks = markdown_to_html_node(md)
-        # i am testing if it creates a zipped list of block and BlockType tuples
-        expected = [
-            ("This is a paragraph.", BlockType.PARAGRAPH),
-            ("### This is a heading", BlockType.HEADING),
-            ("```python```", BlockType.CODE)
-        ]
-        self.assertListEqual(blocks, expected)
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>",
+        )
+
+    def test_multiple_lists_and_quote(self):
+        md = """
+> This is a quote
+
+- This is a list
+- with items
+
+1. First item
+2. Second item
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a quote</blockquote><ul><li>This is a list</li><li>with items</li></ul><ol><li>First item</li><li>Second item</li></ol></div>",
+        )
+
+    def test_heading_levels_and_mixed_content(self):
+        md = """
+# Heading 1
+
+wow words
+
+```
+Some `inline code` here
+```
+
+## Heading 2
+
+Some more text with **bold** and _italic_ styles.
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><h1>Heading 1</h1><p>wow words</p><pre><code>Some `inline code` here</code></pre><h2>Heading 2</h2><p>Some more text with <b>bold</b> and <i>italic</i> styles.</p></div>",
+        )
+
+    def test_empty_markdown(self):
+        md = ""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div></div>")
+    
+    def test_invalid_code_block(self):
+        md = """
+```
+This is an invalid code block because it does not end properly.
+"""
+        with self.assertRaises(ValueError) as context:
+            node = markdown_to_html_node(md)
+        self.assertIn("unmatched delimiter", str(context.exception))
 
 if __name__ == "__main__":
     unittest.main()
