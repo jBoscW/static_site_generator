@@ -33,13 +33,14 @@ def markdown_to_blocks(markdown_text):
 
 def block_to_block_type(markdown):
     lines = markdown.split('\n')
+    markdown = markdown.strip()
 
     if markdown.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
     if markdown.startswith("```") and lines[-1].startswith("```"): 
         return BlockType.CODE
     if markdown.startswith('> '): 
-        if all(line.startswith('> ') for line in lines):
+        if all(line.startswith('>') for line in lines):
             return BlockType.QUOTE
     if markdown.startswith('- '): 
         if all(line.startswith('- ') for line in lines):
@@ -114,8 +115,9 @@ def create_ordered_list_html_node(txt):
 
 def create_other_html_node(txt, blocktype):
     if blocktype is BlockType.QUOTE: 
-        txt = txt[2:] #skips '> '
-    txt = txt.replace('\n', ' ')
+        txt = '\n'.join(line[2:] for line in txt.split('\n')) #skips '> '
+    elif blocktype is BlockType.PARAGRAPH: 
+        txt = txt.replace('\n', ' ')
 
     tag = blocktype.value
     txt_nodes = fu.text_to_textnodes(txt)

@@ -1,11 +1,11 @@
 import os
 import shutil
+import src.blocks as blocks
 
 def delete_and_move(public_dir, static_dir, deleted=False): 
     public_abspath = os.path.abspath(public_dir)
     static_abspath = os.path.abspath(static_dir)
     if not os.path.exists(static_abspath):
-        print(f"static path: {static_abspath}")
         raise ValueError("static directory does not exist")
     
     if deleted == False:
@@ -34,3 +34,22 @@ def extract_title(markdown):
             return line.lstrip('#').strip()
         
     raise Exception("Title must start with '# '")
+
+def generate_page(from_path, template_path, dest_path): 
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+
+    with open(from_path, 'r') as f: 
+        original_md = f.read()
+    with open(template_path, 'r') as f: 
+        template = f.read()
+    
+    html_txt = blocks.markdown_to_html_node(original_md).to_html()
+    title = extract_title(original_md)
+    new_txt = template.replace("{{ Title }}", title)
+    new_txt = new_txt.replace("{{ Content }}", html_txt)
+
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, 'w') as f:
+        f.write(new_txt)
+    
+
