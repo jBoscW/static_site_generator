@@ -115,7 +115,8 @@ def create_ordered_list_html_node(txt):
 
 def create_other_html_node(txt, blocktype):
     if blocktype is BlockType.QUOTE: 
-        txt = '\n'.join(line[2:] for line in txt.split('\n')) #skips '> '
+        #skips '> '
+        txt = '\n'.join(line[2:] for line in txt.split('\n')) 
     elif blocktype is BlockType.PARAGRAPH: 
         txt = txt.replace('\n', ' ')
 

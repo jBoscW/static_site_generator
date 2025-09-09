@@ -5,8 +5,8 @@
 Here's the deal, **I like Tolkien**.
 
 > "I am in fact a Hobbit in all but size."
->
-> -- J.R.R. Tolkien
+> 
+> — J.R.R. Tolkien 
 
 ## Blog posts
 

@@ -90,6 +90,8 @@ blockquote {
   padding-right: 0.5em;
   color: #ddd;
   font-style: italic;
+  white-space: pre-line;
+
 }
 
 img {
