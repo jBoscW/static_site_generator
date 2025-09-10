@@ -12,7 +12,7 @@ def main():
     if len(sys.argv) > 1: 
         basepath = sys.argv[1]
     
-    b = lambda path: str(basepath) + path[2:]
+    b = lambda path: str(basepath) + path
 
     shutil.rmtree(b(dir_path_public))
     os.mkdir(b(dir_path_public))
