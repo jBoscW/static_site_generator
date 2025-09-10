@@ -1,12 +1,12 @@
-from src.textnode import TextNode, TextType
-from src.htmlnode import *
-from src.funcs import *
-from src.blocks import *
-from src.website_generator import *
+import sys
+from src.website_generator import delete_and_move, generate_pages_recursive
 
-def main(): 
-    node = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
-    
+def main(basepath = '/'):    
+    if len(sys.argv) > 1: 
+        basepath = sys.argv[1]
+
+
+
     delete_and_move(public_dir='./public', static_dir='./static')
 
     generate_pages_recursive(
@@ -18,4 +18,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
