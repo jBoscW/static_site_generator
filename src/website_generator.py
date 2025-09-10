@@ -42,7 +42,6 @@ def generate_page(from_path, dest_path, template_path, base_path):
     new_txt = new_txt.replace('href="/', 'href="' + base_path)
     new_txt = new_txt.replace('src="/', 'src="' + base_path)
     
-    os.makedirs()
     with open(dest_path, 'w') as f:
         f.write(new_txt)
     
@@ -55,8 +54,10 @@ def generate_pages_recursive(dir_path_content, dest_dir_path, template_path, bas
             p = Path(dest_path)
             #Path-library concatenation
             html_dest_path = p.parent / (p.stem + ".html") 
-            generate_page(entry_path, html_dest_path, base_path, template_path)
+            # Pass arguments in the correct order: template_path then base_path
+            generate_page(entry_path, html_dest_path, template_path, base_path)
         elif os.path.isdir(entry_path):
             if not os.path.isdir(dest_path): 
                 os.mkdir(dest_path)
-            generate_pages_recursive(entry_path, dest_path, base_path, template_path)
+            # Recurse with the same argument order
+            generate_pages_recursive(entry_path, dest_path, template_path, base_path)
