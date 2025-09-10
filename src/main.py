@@ -9,9 +9,10 @@ def main():
     
     delete_and_move(public_dir='./public', static_dir='./static')
 
-    generate_page(
-        from_path='./content/index.md', 
-        dest_path='./public/index.html',
+    generate_pages_recursive(
+        dir_path_content='./content', 
+        dest_dir_path='./public', 
+        template_path = './template.html'
     )
 
 

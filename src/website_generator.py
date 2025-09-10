@@ -1,6 +1,7 @@
 import os
 import shutil
 import src.blocks as blocks
+from pathlib import Path
 
 def delete_and_move(public_dir, static_dir, deleted=False):
     if not os.path.exists(static_dir):
@@ -33,7 +34,7 @@ def extract_title(markdown):
     raise Exception("Title must start with '# '")
 
 def generate_page(from_path, dest_path, template_path = './template.html'): 
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+    print(f"Generating page from {from_path} to {dest_path} using template.")
 
     with open(from_path, 'r') as f: 
         original_md = f.read()
@@ -45,7 +46,6 @@ def generate_page(from_path, dest_path, template_path = './template.html'):
     new_txt = template.replace("{{ Title }}", title)
     new_txt = new_txt.replace("{{ Content }}", html_txt)
 
-    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, 'w') as f:
         f.write(new_txt)
     
@@ -56,6 +56,12 @@ def generate_pages_recursive(dir_path_content, dest_dir_path, template_path = '.
     for entry in content_tree:
         entry_path = os.path.join(dir_path_content, entry)
         dest_path = os.path.join(dest_dir_path, entry)
-        if os.path.isfile(entry):
-            shutil.copy(entry_path, dest_path)
-        elif os.path.isdir(entry):
+        if os.path.isfile(entry_path):
+            p = Path(dest_path)
+            #Path-library concatenation
+            html_dest_path = p.parent / (p.stem + ".html") 
+            generate_page(entry_path, html_dest_path, template_abspath)
+        elif os.path.isdir(entry_path):
+            if not os.path.isdir(dest_path): 
+                os.mkdir(dest_path)
+            generate_pages_recursive(entry_path, dest_path, template_abspath)
