@@ -1,1 +1,1 @@
-PYTHONPATH=src python3 -m src.main '/static_site_generator/'
+PYTHONPATH=src python3 -m src.main "/static_site_generator/"
