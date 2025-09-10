@@ -11,7 +11,6 @@ def main():
     basepath = default_basepath
     if len(sys.argv) > 1: 
         basepath = sys.argv[1]
-    if basepath != default_basepath: 
         b = lambda path: str(basepath) + path[2:]
     else: 
         b = lambda x: x
