@@ -26,7 +26,7 @@ def extract_title(markdown):
         
     raise Exception("Title must start with '# '")
 
-def generate_page(from_path, dest_path, base_path, template_path): 
+def generate_page(from_path, dest_path, template_path, base_path): 
     print(f"Generating page from {from_path} to {dest_path} using template.")
 
     with open(from_path, 'r') as f: 
@@ -41,11 +41,12 @@ def generate_page(from_path, dest_path, base_path, template_path):
     new_txt = new_txt.replace("{{ Content }}", html_txt)
     new_txt = new_txt.replace('href="/', 'href="' + base_path)
     new_txt = new_txt.replace('src="/', 'src="' + base_path)
-
+    
+    os.makedirs()
     with open(dest_path, 'w') as f:
         f.write(new_txt)
     
-def generate_pages_recursive(dir_path_content, dest_dir_path, base_path, template_path = './template.html'):
+def generate_pages_recursive(dir_path_content, dest_dir_path, template_path, base_path):
     content_tree = os.listdir(dir_path_content)
     for entry in content_tree:
         entry_path = os.path.join(dir_path_content, entry)
