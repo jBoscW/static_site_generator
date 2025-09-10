@@ -11,17 +11,18 @@ def main():
     basepath = default_basepath
     if len(sys.argv) > 1: 
         basepath = sys.argv[1]
-    
-    b = lambda path: str(basepath) + path
 
-    shutil.rmtree(b(dir_path_public))
-    os.mkdir(b(dir_path_public))
-    delete_and_move(b(dir_path_public), b(dir_path_static))
+    b = lambda path: str(basepath) + path
+    print(b(dir_path_content))
+
+    shutil.rmtree(dir_path_public)
+    os.mkdir(dir_path_public)
+    delete_and_move(dir_path_public, dir_path_static)
 
     generate_pages_recursive(
-        dir_path_content = b(dir_path_content),
-        dest_dir_path = b(dir_path_public),
-        template_path = b(template_path),
+        dir_path_content = (dir_path_content),
+        dest_dir_path = (dir_path_public),
+        template_path = (template_path),
         base_path = basepath
     )
 
