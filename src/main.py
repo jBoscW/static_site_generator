@@ -1,20 +1,26 @@
 import sys
-from src.website_generator import delete_and_move, generate_pages_recursive
+from src.website_generator import * 
 
-def main(basepath = '/'):    
+dir_path_static = "./static"
+dir_path_public = "./docs"
+dir_path_content = "./content"
+template_path = "./template.html"
+default_basepath = "/"
+
+def main():
+    basepath = default_basepath
     if len(sys.argv) > 1: 
         basepath = sys.argv[1]
 
-    delete_and_move(public_dir='./public', static_dir='./static')
+    delete_and_move(dir_path_public, dir_path_static)
 
     generate_pages_recursive(
-        dir_path_content = './content', 
-        dest_dir_path = './public', 
+        dir_path_content = dir_path_content,
+        dest_dir_path = dir_path_public,
         base_path = basepath,
-        template_path = './template.html'
+        template_path = template_path
     )
 
 
 if __name__ == "__main__":
-
     main()
