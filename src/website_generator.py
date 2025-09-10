@@ -3,16 +3,9 @@ import shutil
 import src.blocks as blocks
 from pathlib import Path
 
-def delete_and_move(public_dir, static_dir, deleted=False):
+def delete_and_move(public_dir, static_dir):
     if not os.path.exists(static_dir):
         raise ValueError("static directory does not exist")
-    
-    if deleted == False:
-        print(f"deleting {public_dir} and contents: {os.listdir(public_dir)}")
-        print('creating new one')
-        shutil.rmtree(public_dir)
-        os.mkdir(public_dir)
-        deleted = True
 
     static_tree = os.listdir(static_dir)
     for entry in static_tree: 
@@ -22,7 +15,7 @@ def delete_and_move(public_dir, static_dir, deleted=False):
             shutil.copy(entry_path, public_dir)
         elif os.path.isdir(entry_path):
             os.mkdir(public_new_path)
-            delete_and_move(public_new_path, entry_path, deleted=True)
+            delete_and_move(public_new_path, entry_path)
 
 def extract_title(markdown): 
     markdown = markdown.strip().split('\n')
